@@ -38,6 +38,10 @@ export const App = () => {
     setText('');
   };
 
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+  };
+
   return (
     <div>
      {/* コールバックとして () => handleOnSubmit() を渡す */}
@@ -47,11 +51,7 @@ export const App = () => {
           handleOnSubmit();
         }}
       >
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
+        <input type="text" value={text} onChange={(e) => handleOnChange(e)} />
         {/* 上に同じ */}
         <input type="submit" value="追加" onSubmit={handleOnSubmit} />
      </form>
