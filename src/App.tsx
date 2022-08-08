@@ -15,27 +15,46 @@ export const App = () => {
 
   const [todos, setTodos] = useState<Todo[]>([]);
 
+  const handleOnSubmit = () => {
+    // 何も入力されていなかったらリターン
+    if (!text) return;
+
+    // 新しい Todo を作成
+    const newTodo: Todo = {
+      value: text,
+    };
+
+    /**
+     * スプレッド構文を用いて todos ステートのコピーへ newTodo を追加する
+     * 以下と同義
+     *
+     * const copyTodos = todos.slice();
+     * copyTodos.unshift(newTodo);
+     * setTodos(copyTodos);
+     *
+     **/
+    setTodos([newTodo, ...todos]);
+    // フォームへの入力をクリアする
+    setText('');
+  };
+
   return (
     <div>
-      <form onSubmit={(e) => e.preventDefault()}>
-        {/*
-          入力中テキストの値を text ステートが
-          持っているのでそれを value として表示
-
-          onChange イベント（＝入力テキストの変化）を
-          text ステートに反映する
-         */}
+     {/* コールバックとして () => handleOnSubmit() を渡す */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleOnSubmit();
+        }}
+      >
         <input
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        <input
-          type="submit"
-          value="追加"
-          onSubmit={(e) => e.preventDefault()}
-        />
-      </form>
-    </div>
+        {/* 上に同じ */}
+        <input type="submit" value="追加" onSubmit={handleOnSubmit} />
+     </form>
+   </div>
   );
 };
