@@ -122,6 +122,12 @@ export const App = () => {
     }
   });
 
+  const handleOnEmpty = () => {
+    // シャローコピーで事足りる
+    const newTodos = todos.filter((todo) => !todo.removed);
+    setTodos(newTodos);
+  };
+
   return (
     <div>
       <select
@@ -133,25 +139,30 @@ export const App = () => {
         <option value="unchecked">現在のタスク</option>
         <option value="removed">ごみ箱</option>
       </select>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleOnSubmit();
-        }}
-      >
-        <input
-          type="text"
-          value={text}
-          disabled={filter === 'checked' || filter === 'removed'}
-          onChange={(e) => handleOnChange(e)}
-        />
-        <input
-          type="submit"
-          value="追加"
-          disabled={filter === 'checked' || filter === 'removed'}
-          onSubmit={(e) => handleOnSubmit(e)}
-        />
-      </form>
+      {filter === 'removed' ? (
+        // コールバックに handleOnEmpty() を渡す
+        <button 
+          onClick={handleOnEmpty}
+          disabled={todos.filter((todo) => todo.removed).length === 0}
+        >ゴミ箱を空にする</button>
+      ) : (
+        // フィルターが `checked` でなければ入力フォームを表示
+        filter !== 'checked' && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleOnSubmit();
+            }}
+          >
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => handleOnChange(e)}
+            />
+            <input type="submit" value="追加" onSubmit={handleOnSubmit} />
+          </form>
+        )
+      )}
      <ul>
         {filteredTodos.map((todo) => {
           return <li key={todo.id}>
