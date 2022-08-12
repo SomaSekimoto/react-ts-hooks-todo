@@ -8,6 +8,8 @@ type Todo = {
   removed: boolean;
 };
 
+type Filter = 'all' | 'checked' | 'unchecked' | 'removed';
+
 export const App = () => {
   /**
    * text = ステートの値
@@ -17,6 +19,8 @@ export const App = () => {
   const [text, setText] = useState('');
 
   const [todos, setTodos] = useState<Todo[]>([]);
+
+  const [filter, setFilter] = useState<Filter>('all');
 
   const handleOnSubmit = () => {
     // 何も入力されていなかったらリターン
@@ -98,21 +102,58 @@ export const App = () => {
     setTodos(newTodos);
   };
 
+  const filteredTodos = todos.filter((todo) => {
+    // filter ステートの値に応じて異なる内容の配列を返す
+    switch (filter) {
+      case 'all':
+        // 削除されていないもの全て
+        return !todo.removed;
+      case 'checked':
+        // 完了済 **かつ** 削除されていないもの
+        return todo.checked && !todo.removed;
+      case 'unchecked':
+        // 未完了 **かつ** 削除されていないもの
+        return !todo.checked && !todo.removed;
+      case 'removed':
+        // 削除済みのもの
+        return todo.removed;
+      default:
+        return todo;
+    }
+  });
+
   return (
     <div>
-     {/* コールバックとして () => handleOnSubmit() を渡す */}
+      <select
+        defaultValue="all"
+        onChange={(e) => setFilter(e.target.value as Filter)}
+      >
+        <option value="all">すべてのタスク</option>
+        <option value="checked">完了したタスク</option>
+        <option value="unchecked">現在のタスク</option>
+        <option value="removed">ごみ箱</option>
+      </select>
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleOnSubmit();
         }}
       >
-        <input type="text" value={text} onChange={(e) => handleOnChange(e)} />
-        {/* 上に同じ */}
-        <input type="submit" value="追加" onSubmit={handleOnSubmit} />
-     </form>
+        <input
+          type="text"
+          value={text}
+          disabled={filter === 'checked' || filter === 'removed'}
+          onChange={(e) => handleOnChange(e)}
+        />
+        <input
+          type="submit"
+          value="追加"
+          disabled={filter === 'checked' || filter === 'removed'}
+          onSubmit={(e) => handleOnSubmit(e)}
+        />
+      </form>
      <ul>
-        {todos.map((todo) => {
+        {filteredTodos.map((todo) => {
           return <li key={todo.id}>
                     <input
                       type="checkbox"
