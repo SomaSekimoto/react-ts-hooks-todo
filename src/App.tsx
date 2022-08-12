@@ -50,7 +50,10 @@ export const App = () => {
      * todos ステート（のコピー）内の todo の
      * value プロパティを引数 value (= e.target.value) に書き換える
      */
-    const newTodos = todos.map((todo) => {
+
+    const deepCopy = todos.map((todo) => ({ ...todo }));
+
+    const newTodos = deepCopy.map((todo) => {
       if (todo.id === id) {
         todo.value = value;
       }
