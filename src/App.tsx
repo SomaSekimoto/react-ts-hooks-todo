@@ -5,6 +5,7 @@ type Todo = {
   value: string;
   readonly id : number;
   checked: boolean;
+  removed: boolean;
 };
 
 export const App = () => {
@@ -22,10 +23,13 @@ export const App = () => {
     if (!text) return;
 
     // 新しい Todo を作成
+    if (!text) return;
+
     const newTodo: Todo = {
       value: text,
       id: new Date().getTime(),
       checked: false,
+      removed: false,
     };
 
     /**
@@ -81,6 +85,19 @@ export const App = () => {
     setTodos(newTodos);
   };
 
+  const handleOnRemove = (id: number, removed: boolean) => {
+    const deepCopy = todos.map((todo) => ({ ...todo }));
+
+    const newTodos = deepCopy.map((todo) => {
+      if (todo.id === id) {
+        todo.removed = !removed;
+      }
+      return todo;
+    });
+
+    setTodos(newTodos);
+  };
+
   return (
     <div>
      {/* コールバックとして () => handleOnSubmit() を渡す */}
@@ -99,15 +116,19 @@ export const App = () => {
           return <li key={todo.id}>
                     <input
                       type="checkbox"
+                      disabled={todo.removed}
                       checked={todo.checked}
                       onChange={() => handleOnCheck(todo.id, todo.checked)}
                     />
                     <input
                       type="text"
-                      disabled={todo.checked}
+                      disabled={todo.checked || todo.removed}
                       value={todo.value}
                       onChange={(e) => handleOnEdit(todo.id, e.target.value)}
                     />
+                    <button onClick={() => handleOnRemove(todo.id, todo.removed)}>
+                      {todo.removed ? '復元' : '削除'}
+                    </button>
                 </li>
         })}
       </ul>
